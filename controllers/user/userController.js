@@ -83,42 +83,54 @@ const signup = async (req, res) => {
 
 // Get all blog entries
 const signupGoogle = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // TODO: Validate email and password inputs
+
+    // Check if the user with the given email already exists
+    const checkUserQuery = `
+      SELECT * FROM people
+      WHERE email = $1;
+    `;
+    const checkUserValues = [email];
+
     try {
-      const { email } = req.body;
-  
-      // TODO: Validate email and password inputs
-  
-      // Check if the user with the given email already exists
-      const checkUserQuery = `
-        SELECT * FROM people
-        WHERE email = $1;
-      `;
-      const checkUserValues = [email];
-  
       const existingUser = await pool.query(checkUserQuery, checkUserValues);
-  
       if (existingUser.rows.length > 0) {
         // User with the provided email already exists
-        return res.status(409).json({ message: "login successful", user: result.rows[0]  });
+        const token = jwt.sign({ email }, SECRET_KEY);
+        return res.status(200).json({ message: "login successful", user: existingUser.rows[0], token: token, loginType: "google" });
       }
-  
-      // Assuming you have a 'users' table with columns 'email' and 'password'
-      const signUpQuery = `
-        INSERT INTO people (email)
-        VALUES ($1)
-        RETURNING *;
-      `;
-  
-      const signUpValues = [email];
-  
+    } catch (error) {
+      console.error('Error checking existing user:', error);
+      return res.status(500).json({ error: 'Internal server error', details: error.message });
+    }
+
+    // Assuming you have a 'users' table with columns 'name', 'email', and 'password'
+    const signUpQuery = `
+      INSERT INTO people (name, email, password)
+      VALUES ($1, $2, $3)
+      RETURNING *;
+    `;
+
+    // Assuming you want to insert an empty string for the 'name' and 'password' fields
+    const signUpValues = ['', email, ''];
+
+    try {
       const newUser = await pool.query(signUpQuery, signUpValues);
-  
-      res.status(201).json({ message: "Signup successful", user: newUser.rows[0] });
+      const token = jwt.sign({ email }, SECRET_KEY);
+      res.status(201).json({ message: "Signup successful", user: newUser.rows[0], token: token, loginType: "google" });
     } catch (error) {
       console.error("Error during signup:", error);
-      res.status(500).json({ error: "Internal server error" });
+      res.status(500).json({ error: "Internal server error", details: error.message });
     }
-  };
+  } catch (error) {
+    console.error("Error in signupGoogle:", error);
+    res.status(500).json({ error: "Internal server error", details: error.message });
+  }
+};
+
   
   //Function to hash the password (you need to implement this based on your chosen library)
   const hashPassword = async (password) => {
