@@ -18,7 +18,6 @@ const addProduct = async (req, res) => {
       owner_id,
       image,
       description,
-      rating,
       postal_code,
       price_hourly,
       price_daily,
@@ -28,23 +27,24 @@ const addProduct = async (req, res) => {
       product_latitude,
       category,
     } = req.body;
-    // console.log(req.body);
+    console.log(req.body);
     // console.log("title: " + title);
 
     const query = `
       INSERT INTO products
-        (title, ownerId, image, description, rating, postalCode, priceHourly, priceDaily, priceWeekly, priceMonthly, prodLongitude, prodLatitude, category)
+        (title, owner_id, image, description, rating, postal_code, price_hourly, price_daily, price_weekly, price_monthly, product_longitude, product_latitude, category)
       VALUES
         ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
       RETURNING id;
     `;
+    // const query = ``;
 
     const values = [
       title,
       owner_id,
       image,
       description,
-      rating,
+      0,
       postal_code,
       price_hourly,
       price_daily,
@@ -67,57 +67,50 @@ const addProduct = async (req, res) => {
 
 const updateProduct = async (req, res) => {
   try {
-    const productId = req.params.id;
+    const id = req.params.id;
     const {
       title,
-      desc,
-      rating,
-      prodLongitude,
-      prodLatitude,
-      postalCode,
-      priceHourly,
-      priceDaily,
-      priceWeekly,
-      priceMonthly,
       image,
+      description,
+      postal_code,
+      price_hourly,
+      price_daily,
+      price_weekly,
+      price_monthly,
     } = req.body;
+    //console.log(req.body);
 
     const query = `
       UPDATE products
       SET
         title = $1,
-        description = $2,
-        rating = $3,
-        prod_longitude = $4,
-        prod_latitude = $5,
-        postal_code = $6,
-        price_hourly = $7,
-        price_daily = $8,
-        price_weekly = $9,
-        price_monthly = $10,
-        image = $11
-      WHERE id = $12
+        image = $2,
+        description = $3,
+        postal_code = $4,
+        price_hourly = $5,
+        price_daily = $6,
+        price_weekly = $7,
+        price_monthly = $8
+      WHERE id = $9
       RETURNING *;
     `;
 
     const values = [
       title,
-      desc,
-      rating,
-      prodLongitude,
-      prodLatitude,
-      postalCode,
-      priceHourly,
-      priceDaily,
-      priceWeekly,
-      priceMonthly,
       image,
-      productId,
+      description,
+      postal_code,
+      price_hourly,
+      price_daily,
+      price_weekly,
+      price_monthly,
+      id,
     ];
+    //console.log(values);
 
     const result = await pool.query(query, values);
 
-    res.json(result.rows[0]);
+    res.status(201).json(result.rows[0]);
   } catch (error) {
     console.error('Error updating product:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -126,11 +119,11 @@ const updateProduct = async (req, res) => {
 
 const deleteProduct = async (req, res) => {
   try {
-    const productId = req.params.id;
+    const id = req.params.id;
 
-    await pool.query('DELETE FROM products WHERE id = $1', [productId]);
+    await pool.query('DELETE FROM products WHERE id = $1', [id]);
 
-    res.json({ message: 'Product deleted successfully' });
+    res.status(200).json({ message: 'Product deleted successfully' });
   } catch (error) {
     console.error('Error deleting product:', error);
     res.status(500).json({ error: 'Internal server error' });

@@ -7,10 +7,10 @@ const auth = require("../../middleware/auth.js");
 router.get("/view", productController.viewProduct);
 
 // login user
-router.post("/add", auth, productController.addProduct);
+router.post("/add", productController.addProduct);
 
 //signup user
-router.put("/update/:id", auth, productController.updateProduct);
+router.put("/update/:id", productController.updateProduct);
 
 //signupGoogle user
 router.delete("/delete/:id", productController.deleteProduct);
