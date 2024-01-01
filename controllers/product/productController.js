@@ -1,10 +1,12 @@
 const pool = require("../../db");
-// const { Product } = require('../../models/product/productModel'); 
+const { ProductModel } = require('../../models/product/productModel'); 
 
 const viewProduct = async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM products');
-    res.json(result.rows);
+    const inventoryItems = result.rows.map(row => new ProductModel(row));
+    res.json(inventoryItems);
+    // res.json(result.rows);
   } catch (error) {
     console.error('Error retrieving products:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -15,19 +17,19 @@ const addProduct = async (req, res) => {
   try {
     const {
       title,
-      owner_id,
+      ownerId,
       image,
       description,
-      postal_code,
-      price_hourly,
-      price_daily,
-      price_weekly,
-      price_monthly,
-      product_longitude,
-      product_latitude,
+      postalCode,
+      priceHourly,
+      priceDaily,
+      priceWeekly,
+      priceMonthly,
+      productLongitude,
+      productLatitude,
       category,
     } = req.body;
-    console.log(req.body);
+    //console.log(req.body);
     // console.log("title: " + title);
 
     const query = `
@@ -37,21 +39,21 @@ const addProduct = async (req, res) => {
         ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
       RETURNING id;
     `;
-    // const query = ``;
+    //const query = ``;
 
     const values = [
       title,
-      owner_id,
+      ownerId,
       image,
       description,
       0,
-      postal_code,
-      price_hourly,
-      price_daily,
-      price_weekly,
-      price_monthly,
-      product_longitude,
-      product_latitude,
+      postalCode,
+      priceHourly,
+      priceDaily,
+      priceWeekly,
+      priceMonthly,
+      productLongitude,
+      productLatitude,
       category,
     ];
 
@@ -72,13 +74,13 @@ const updateProduct = async (req, res) => {
       title,
       image,
       description,
-      postal_code,
-      price_hourly,
-      price_daily,
-      price_weekly,
-      price_monthly,
+      postalCode,
+      priceHourly,
+      priceDaily,
+      priceWeekly,
+      priceMonthly,
     } = req.body;
-    //console.log(req.body);
+    console.log(req.body);
 
     const query = `
       UPDATE products
@@ -99,11 +101,11 @@ const updateProduct = async (req, res) => {
       title,
       image,
       description,
-      postal_code,
-      price_hourly,
-      price_daily,
-      price_weekly,
-      price_monthly,
+      postalCode,
+      priceHourly,
+      priceDaily,
+      priceWeekly,
+      priceMonthly,
       id,
     ];
     //console.log(values);
