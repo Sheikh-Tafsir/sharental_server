@@ -2,6 +2,7 @@ const pool = require("../../db");
 const jwt = require('jsonwebtoken');
 const SECRET_KEY = 'your-secret-key';
 const bcrypt = require('bcrypt');
+const { UserModel } = require("../../models/user/userModel");
 const saltRounds = 10; // Number of salt rounds to use
 
 
@@ -131,6 +132,59 @@ const signupGoogle = async (req, res) => {
   }
 };
 
+const updateProfile = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const {
+      name,
+      email,
+      image,
+      phoneNo,
+      postalCode,
+      address,
+      addressLongitude,
+      addressLatitude,
+    } = req.body;
+    console.log(req.body);
+
+    const query = `
+      UPDATE people
+      SET
+        name = $1,
+        email = $2,
+        image = $3,
+        phone_no= $4,
+        postal_code = $5,
+        address=$6,
+        address_longitude = $7,
+        address_latitude = $8
+      WHERE id = $9
+      RETURNING *;
+    `;
+    //const query = ``
+
+    const values = [
+      name,
+      email,
+      image,
+      phoneNo,
+      postalCode,
+      address,
+      addressLongitude,
+      addressLatitude,
+      id,
+    ];
+    //console.log(values);
+
+    const result = await pool.query(query, values);
+    const updateInfo = new UserModel(result.rows[0]);
+    res.json(updateInfo);
+    //res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error('Error updating product:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
   
   //Function to hash the password (you need to implement this based on your chosen library)
   const hashPassword = async (password) => {
@@ -149,6 +203,7 @@ module.exports = {
   login,
   signup,
   signupGoogle,
+  updateProfile,
 };
 
 

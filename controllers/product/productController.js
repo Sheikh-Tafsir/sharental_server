@@ -13,6 +13,26 @@ const viewProduct = async (req, res) => {
   }
 };
 
+const viewMyProduct = async (req, res) => {
+  try {
+    const ownerId = req.params.ownerId;
+    //console.log(ownerId);
+    const query = `SELECT * FROM products WHERE owner_id = $1`;
+    const values = [
+      ownerId,
+    ];
+    //console.log(values);
+
+    const result = await pool.query(query, values);
+    const inventoryItems = result.rows.map(row => new ProductModel(row));
+    res.json(inventoryItems);
+    // res.json(result.rows);
+  } catch (error) {
+    console.error('Error retrieving products:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
 const addProduct = async (req, res) => {
   try {
     const {
@@ -134,6 +154,7 @@ const deleteProduct = async (req, res) => {
 
 module.exports = {
     viewProduct,
+    viewMyProduct,
     addProduct,
     updateProduct,
     deleteProduct,

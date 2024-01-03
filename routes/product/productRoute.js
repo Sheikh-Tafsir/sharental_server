@@ -6,6 +6,9 @@ const auth = require("../../middleware/auth.js");
 //view all
 router.get("/view", productController.viewProduct);
 
+//view my
+router.get("/view/:ownerId", productController.viewMyProduct);
+
 // login user
 router.post("/add", productController.addProduct);
 

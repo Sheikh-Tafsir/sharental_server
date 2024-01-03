@@ -11,5 +11,8 @@ router.post("/signup", userController.signup);
 //signupGoogle user
 router.post("/signupgoogle", userController.signupGoogle);
 
+//signupGoogle user
+router.post("/profile/update/:id", userController.updateProfile);
+
 
 module.exports = router;
