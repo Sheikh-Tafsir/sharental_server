@@ -26,7 +26,8 @@ const login = async (req, res) => {
       if (result.rows.length === 1) {
         // User found, login successful
         const token = jwt.sign({ name }, SECRET_KEY);
-        res.status(200).json({ message: "Login successful", user: result.rows[0], token: token, loginType: "email" });
+        const userModel = new UserModel(result.rows[0]);
+        res.status(200).json({ message: "Login successful", user: userModel, token: token, loginType: "email" });
       } else {
         // User not found or invalid credentials
         res.status(401).json({ error: "Invalid credentials" });
@@ -74,7 +75,8 @@ const signup = async (req, res) => {
       const newUser = await pool.query(signUpQuery, signUpValues);
   
       const token = jwt.sign({ name }, SECRET_KEY);
-      res.status(201).json({ message: "Signup successful", user: newUser.rows[0], token: token, loginType: "email" });
+      const userModel = new UserModel(newUser.rows[0]);
+      res.status(201).json({ message: "Signup successful", user: userModel, token: token, loginType: "email" });
     } catch (error) {
       console.error("Error during signup:", error);
       res.status(500).json({ error: "Internal server error" });
@@ -101,7 +103,8 @@ const signupGoogle = async (req, res) => {
       if (existingUser.rows.length > 0) {
         // User with the provided email already exists
         const token = jwt.sign({ email }, SECRET_KEY);
-        return res.status(200).json({ message: "login successful", user: existingUser.rows[0], token: token, loginType: "google" });
+        const userModel = new UserModel(existingUser.rows[0]);
+        return res.status(200).json({ message: "login successful", user: userModel, token: token, loginType: "google" });
       }
     } catch (error) {
       console.error('Error checking existing user:', error);
@@ -177,8 +180,8 @@ const updateProfile = async (req, res) => {
     //console.log(values);
 
     const result = await pool.query(query, values);
-    const updateInfo = new UserModel(result.rows[0]);
-    res.json(updateInfo);
+    const userModel = new UserModel(result.rows[0]);
+    res.json(userModel);
     //res.status(201).json(result.rows[0]);
   } catch (error) {
     console.error('Error updating product:', error);
