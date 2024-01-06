@@ -52,6 +52,7 @@ const signup = async (req, res) => {
         SELECT * FROM people
         WHERE name = $1;
       `;
+      
       const checkUserValues = [name];
   
       const existingUser = await pool.query(checkUserQuery, checkUserValues);
@@ -59,6 +60,21 @@ const signup = async (req, res) => {
       if (existingUser.rows.length > 0) {
         // User with the provided email already exists
         return res.status(409).json({ error: "User already exists" });
+      }
+
+      // Check if the user with the given email already exists
+      const checkEmailQuery = `
+        SELECT * FROM people
+        WHERE email = $1;
+      `;
+
+      const checkEmailValues = [email];
+
+      const existingEmail = await pool.query(checkEmailQuery, checkEmailValues);
+
+      if (existingEmail.rows.length > 0) {
+        // User with the provided email already exists
+        return res.status(409).json({ error: "Email already exists" });
       }
   
       // Assuming you have a 'users' table with columns 'email' and 'password'
@@ -150,6 +166,33 @@ const updateProfile = async (req, res) => {
     } = req.body;
     console.log(req.body);
 
+    const checkUserQuery = `
+      SELECT * FROM people
+      WHERE name = $1 AND id != $2;`;
+    
+    const checkUserValues = [name, id];
+  
+    const existingUser = await pool.query(checkUserQuery, checkUserValues);
+  
+    if (existingUser.rows.length > 0) {
+        // User with the provided email already exists
+      return res.status(409).json({ error: "User already exists" });
+    }
+
+    // Check if the user with the given email already exists
+    const checkEmailQuery = `
+      SELECT * FROM people
+      WHERE email = $1 AND id != $2;`;
+
+    const checkEmailValues = [email, id];
+
+    const existingEmail = await pool.query(checkEmailQuery, checkEmailValues);
+
+    if (existingEmail.rows.length > 0) {
+      // User with the provided email already exists
+      return res.status(409).json({ error: "Email already exists" });
+    }
+
     const query = `
       UPDATE people
       SET
@@ -181,7 +224,7 @@ const updateProfile = async (req, res) => {
 
     const result = await pool.query(query, values);
     const userModel = new UserModel(result.rows[0]);
-    res.json(userModel);
+    res.status(201).json(userModel);
     //res.status(201).json(result.rows[0]);
   } catch (error) {
     console.error('Error updating product:', error);
