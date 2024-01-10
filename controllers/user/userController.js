@@ -6,8 +6,8 @@ const { UserModel } = require("../../models/user/userModel");
 const saltRounds = 10; // Number of salt rounds to use
 
 
-//login
-const login = async (req, res) => {
+  //login
+  const login = async (req, res) => {
   //console.log(req.body);
     try {
       const { name, password } = req.body;
@@ -39,8 +39,8 @@ const login = async (req, res) => {
   };
   
 
-// Get all blog entries
-const signup = async (req, res) => {
+  // Get all blog entries
+  const signup = async (req, res) => {
     try {
       const { name, email, password } = req.body;
       //console.log(req.body);
