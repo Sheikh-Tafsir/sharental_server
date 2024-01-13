@@ -8,7 +8,7 @@ const auth = require("../../middleware/auth.js");
 router.post("/view", chatController.getMessage);
 
 // login user
-router.post("/send", chatController.sendMessage);
+//router.post("/send", chatController.sendMessage);
 
 // Expose the router and server for further use
 module.exports = router;
