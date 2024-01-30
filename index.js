@@ -3,7 +3,8 @@ const app = express();
 const pool = require("./db"); // Adjust the path if needed.
 const cors = require("cors");
 const http = require('http');
-const socketConfig = require("./socket/socket"); // Import the Socket.IO configuration
+//const socketConfig = require("./socket/socket"); // Import the Socket.IO configuration
+const pubnub = require('./pubnub/pubnubConfig');
 
 require("dotenv").config();
 
@@ -25,15 +26,15 @@ app.get("/", (req, res) => {
 //app.use("/api/v1", baseRoutes);
 app.use("/user", require("./routes/user/userRoute"));
 app.use("/products", require("./routes/product/productRoute"));
-app.use("/chats", require("./routes/chat/chatRoute"));
+app.use("/chats", require("./routes/chat//chatRoute2"));
 
-
+//this part is for socket io, when use it change the app.listen to server.listen
 // Import the Socket.IO configuration and pass the HTTP server to it
-const server = http.createServer(app);
-socketConfig(server);
+//const server = http.createServer(app);
+//socketConfig(server);
 
 // Start the server on a specific port (e.g., 3000).
 const PORT = process.env.PORT || 3001;
-server.listen(PORT, () => {
+app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
 });

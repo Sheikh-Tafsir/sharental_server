@@ -1,5 +1,50 @@
 const pool = require("../../db");
 const { ChatModel } = require('../../models/chat/chatModel'); 
+const pubnub = require('../../pubnub/pubnubConfig');
+
+  const startChat = async(req, res) => {
+    try {
+      const { sendBy, sendTo, message, createdAt } = req.body;
+  
+      const query = `
+        INSERT INTO chats 
+          (send_by, send_to, message, created_at) 
+        VALUES 
+          ($1, $2, $3, $4) RETURNING *;
+      `;
+      const values = [sendBy, sendTo, message, createdAt];
+      const result = await pool.query(query, values);
+
+      const chatModel = new ChatModel(result.rows[0]);
+
+      const channelName = `chat_${sendBy}_${sendTo}`;
+
+      const chat ={
+        _id : chatModel._id,
+        createdAt : chatModel.createdAt,
+        text: chatModel.message,
+        user : {
+          _id: chatModel.sendBy,
+        },
+
+      }
+      // console.log(chat);
+      // console.log(channelName);
+
+      res.status(200).json({ message: "message sent", chat: chat});
+
+      pubnub.publish({
+        channel: channelName,
+        message: { text: chat },
+      });
+
+      //return { message: "message sent", chat: chatModel};
+
+    } catch (error) {
+      console.error("Error dduring sending message:", error);
+      throw error;
+    }
+  };
 
     const getMessage = async (req, res) => {
     //console.log(req.body);
@@ -124,6 +169,7 @@ const { ChatModel } = require('../../models/chat/chatModel');
     };
 
     module.exports = {
+        startChat,
         getMessage,
         sendMessage,
         updateFriends,

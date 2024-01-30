@@ -26,9 +26,11 @@ module.exports = (server) => {
       try {
         console.log('Private message received:', data);
         const result = await chatController.sendMessage(data);
+        const updateFriends = await chatController.updateFriends(data);
         const chatId = result.chat._id;
         
         acknowledgment({ status: 'Message received successfully', _id: chatId });
+
 
         const sendTo = data.sendTo;
         const userSocket = userSocketMap[sendTo];

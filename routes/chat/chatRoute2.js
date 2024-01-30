@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const chatController = require("../../controllers/chat/chatController.js");
+const chatController = require("../../controllers/chat/chatController2.js");
 const auth = require("../../middleware/auth.js");
 
 
@@ -9,8 +9,9 @@ router.post("/view", chatController.getMessage);
 
 //view my
 router.post("/friends", chatController.getFriends);
-// login user
-//router.post("/send", chatController.sendMessage);
+
+// send message
+router.post("/send", chatController.startChat);
 
 // Expose the router and server for further use
 module.exports = router;
