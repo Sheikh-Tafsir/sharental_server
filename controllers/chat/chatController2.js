@@ -56,7 +56,9 @@ const pubnub = require('../../pubnub/pubnubConfig');
         
         const query = `
             SELECT * FROM chats
-            WHERE (send_by = $1 AND send_to = $2) OR (send_by = $2 AND send_to = $1);
+            WHERE (send_by = $1 AND send_to = $2) OR (send_by = $2 AND send_to = $1) 
+            ORDER BY created_at DESC
+            LIMIT 14;
         `;
         const values = [sendBy, sendTo];
     
@@ -97,52 +99,6 @@ const pubnub = require('../../pubnub/pubnubConfig');
         }
       };
 
-    // const sendMessage = async (req, res) => {
-    //     try {
-    //       const { sendBy, sendTo, message, createdAt } = req.body;
-          
-    //       const query = `
-    //         INSERT INTO chats 
-    //           (send_by, send_to, message, created_at) 
-    //         VALUES 
-    //           ($1, $2, $3, $4) RETURNING id;
-    //       `;
-    //       const values = [sendBy, sendTo, message, createdAt];
-      
-    //       const result = await pool.query(query, values);
-    //       const chatId = result.rows[0].id;
-          
-    //       res.status(201).json({ message: "message sent", _id:chatId});
-    //     } catch (error) {
-    //       console.error("Error during login:", error);
-    //       res.status(500).json({ error: "Internal server error" });
-    //     }
-    //   };
-
-
-    const sendMessage = async (data) => {
-      try {
-        const { sendBy, sendTo, message, createdAt } = data;
-    
-        const query = `
-          INSERT INTO chats 
-            (send_by, send_to, message, created_at) 
-          VALUES 
-            ($1, $2, $3, $4) RETURNING *;
-        `;
-        const values = [sendBy, sendTo, message, createdAt];
-        const result = await pool.query(query, values);
-
-        const chatModel = new ChatModel(result.rows[0]);
-        const chatId = result.rows[0].id;
-    
-        // return { message: "message sent", _id: chatId };
-        return { message: "message sent", chat: chatModel};
-      } catch (error) {
-        console.error("Error during sending message:", error);
-        throw error;
-      }
-    };
 
     const updateFriends = async (data) => {
       try {
@@ -171,7 +127,6 @@ const pubnub = require('../../pubnub/pubnubConfig');
     module.exports = {
         startChat,
         getMessage,
-        sendMessage,
         updateFriends,
         getFriends,
     };
