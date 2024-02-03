@@ -26,7 +26,7 @@ app.get("/", (req, res) => {
 //app.use("/api/v1", baseRoutes);
 app.use("/user", require("./routes/user/userRoute"));
 app.use("/products", require("./routes/product/productRoute"));
-//app.use("/chats", require("./routes/chat//chatRoute2"));
+app.use("/chats", require("./routes/chat//chatRoute2"));
 
 //this part is for socket io, when use it change the app.listen to server.listen
 // Import the Socket.IO configuration and pass the HTTP server to it
